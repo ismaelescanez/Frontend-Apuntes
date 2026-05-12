@@ -136,7 +136,7 @@ export default function CreateProductScreen ({ navigation, route }) {
               />
               <ErrorMessage name={'productCategoryId'} render={msg => <TextError>{msg}</TextError> }/>
 
-              <TextRegular>Is it available?</TextRegular>
+              <TextRegular>Direccion predeterminada</TextRegular>
               <Switch
                 trackColor={{ false: GlobalStyles.brandSecondary, true: GlobalStyles.brandPrimary }}
                 thumbColor={values.availability ? GlobalStyles.brandSecondary : '#f4f3f4'}
@@ -205,7 +205,6 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     marginLeft: 5
-
   },
   imagePicker: {
     height: 40,

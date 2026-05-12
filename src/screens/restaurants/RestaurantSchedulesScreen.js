@@ -2,7 +2,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { StyleSheet, FlatList, Pressable, View } from 'react-native'
 
-import { getAll, remove } from '../../api/RestaurantEndpoints'
+import { getRestaurantSchedules, removeSchedule } from '../../api/RestaurantEndpoints'
 import ImageCard from '../../components/ImageCard'
 import TextSemiBold from '../../components/TextSemibold'
 import TextRegular from '../../components/TextRegular'
@@ -11,39 +11,36 @@ import * as GlobalStyles from '../../styles/GlobalStyles'
 import { AuthorizationContext } from '../../context/AuthorizationContext'
 import { showMessage } from 'react-native-flash-message'
 import DeleteModal from '../../components/DeleteModal'
-import restaurantLogo from '../../../assets/restaurantLogo.jpeg'
-import { API_BASE_URL } from '@env'
+import scheduleIcon from '../../../assets/schedule.png'
 
-export default function RestaurantsScreen ({ navigation, route }) {
-  const [restaurants, setRestaurants] = useState([])
-  const [restaurantToBeDeleted, setRestaurantToBeDeleted] = useState(null)
+export default function RestaurantSchedulesScreen ({ navigation, route }) {
   const { loggedInUser } = useContext(AuthorizationContext)
+  const [schedules, setSchedules] = useState([])
+  const [ScheduleToBeDeleted, setScheduleToBeDeleted] = useState(null)
 
   useEffect(() => {
     if (loggedInUser) {
-      fetchRestaurants()
+      fetchSchedules()
     } else {
-      setRestaurants(null)
+      setSchedules([])
     }
   }, [loggedInUser, route])
 
-  const renderRestaurant = ({ item }) => {
+  const renderSchedule = ({ item }) => {
     return (
       <ImageCard
-        imageUri={item.logo ? { uri: API_BASE_URL + '/' + item.logo } : restaurantLogo}
+        imageUri={scheduleIcon}
         title={item.name}
-        onPress={() => {
-          navigation.navigate('RestaurantDetailScreen', { id: item.id })
-        }}
       >
-        <TextRegular numberOfLines={2}>{item.description}</TextRegular>
-        {item.averageServiceMinutes !== null &&
-          <TextSemiBold>Avg. service time: <TextSemiBold textStyle={{ color: GlobalStyles.brandPrimary }}>{item.averageServiceMinutes} min.</TextSemiBold></TextSemiBold>
-        }
-        <TextSemiBold>Shipping: <TextSemiBold textStyle={{ color: GlobalStyles.brandPrimary }}>{item.shippingCosts.toFixed(2)}€</TextSemiBold></TextSemiBold>
+        { /* TODO: mostrar los datos del horario */}
+        <TextSemiBold>Start Time: <TextRegular textStyle={{ color: GlobalStyles.brandGreen }}>{item.startTime}</TextRegular></TextSemiBold>
+        <TextSemiBold>End Time: <TextRegular textStyle={{ color: GlobalStyles.brandPrimary }}>{item.endTime}</TextRegular></TextSemiBold>
+          <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <TextSemiBold textStyle={{ color: item.products.length === 0 ? GlobalStyles.brandPrimary : GlobalStyles.brandSecondary }}>{item.products.length} products associated</TextSemiBold>
+          </View>
         <View style={styles.actionButtonsContainer}>
           <Pressable
-            onPress={() => navigation.navigate('EditRestaurantScreen', { id: item.id })
+            onPress={() => navigation.navigate('EditScheduleScreen', { scheduleId: item.id, restaurantId: item.restaurantId })
             }
             style={({ pressed }) => [
               {
@@ -62,7 +59,7 @@ export default function RestaurantsScreen ({ navigation, route }) {
         </Pressable>
 
         <Pressable
-            onPress={() => { setRestaurantToBeDeleted(item) }}
+            onPress={() => { setScheduleToBeDeleted(item) }}
             style={({ pressed }) => [
               {
                 backgroundColor: pressed
@@ -83,10 +80,10 @@ export default function RestaurantsScreen ({ navigation, route }) {
     )
   }
 
-  const renderEmptyRestaurantsList = () => {
+  const renderEmptySchedulesList = () => {
     return (
       <TextRegular textStyle={styles.emptyList}>
-        No restaurants were retreived. Are you logged in?
+        No schedules were retreived. Either you are not logged in or the restaurant has no schedules yet.
       </TextRegular>
     )
   }
@@ -96,7 +93,7 @@ export default function RestaurantsScreen ({ navigation, route }) {
       <>
       {loggedInUser &&
       <Pressable
-        onPress={() => navigation.navigate('CreateRestaurantScreen')
+        onPress={() => navigation.navigate('CreateScheduleScreen', { id: route.params.id })
         }
         style={({ pressed }) => [
           {
@@ -109,7 +106,7 @@ export default function RestaurantsScreen ({ navigation, route }) {
         <View style={[{ flex: 1, flexDirection: 'row', justifyContent: 'center' }]}>
           <MaterialCommunityIcons name='plus-circle' color={'white'} size={20}/>
           <TextRegular textStyle={styles.text}>
-            Create restaurant
+            Create schedule
           </TextRegular>
         </View>
       </Pressable>
@@ -117,13 +114,14 @@ export default function RestaurantsScreen ({ navigation, route }) {
     </>
     )
   }
-  const fetchRestaurants = async () => {
+
+  const fetchSchedules = async () => {
     try {
-      const fetchedRestaurants = await getAll()
-      setRestaurants(fetchedRestaurants)
+      const fetchedSchedules = await getRestaurantSchedules(route.params.id)
+      setSchedules(fetchedSchedules)
     } catch (error) {
       showMessage({
-        message: `There was an error while retrieving restaurants. ${error} `,
+        message: `There was an error while retrieving orders. ${error} `,
         type: 'error',
         style: GlobalStyles.flashStyle,
         titleStyle: GlobalStyles.flashTextStyle
@@ -131,22 +129,22 @@ export default function RestaurantsScreen ({ navigation, route }) {
     }
   }
 
-  const removeRestaurant = async (restaurant) => {
+  const remove = async (schedule) => {
     try {
-      await remove(restaurant.id)
-      await fetchRestaurants()
-      setRestaurantToBeDeleted(null)
+      await removeSchedule(schedule.restaurantId, schedule.id)
+      await fetchSchedules()
+      setScheduleToBeDeleted(null)
       showMessage({
-        message: `Restaurant ${restaurant.name} succesfully removed`,
+        message: 'Schedule succesfully removed',
         type: 'success',
         style: GlobalStyles.flashStyle,
         titleStyle: GlobalStyles.flashTextStyle
       })
     } catch (error) {
       console.log(error)
-      setRestaurantToBeDeleted(null)
+      setScheduleToBeDeleted(null)
       showMessage({
-        message: `Restaurant ${restaurant.name} could not be removed.`,
+        message: 'Product could not be removed.',
         type: 'error',
         style: GlobalStyles.flashStyle,
         titleStyle: GlobalStyles.flashTextStyle
@@ -155,23 +153,24 @@ export default function RestaurantsScreen ({ navigation, route }) {
   }
 
   return (
-    <>
-    <FlatList
+    <View>
+      <>
+      <FlatList
       style={styles.container}
-      data={restaurants}
-      renderItem={renderRestaurant}
+      data={schedules}
+      renderItem={renderSchedule}
       keyExtractor={item => item.id.toString()}
       ListHeaderComponent={renderHeader}
-      ListEmptyComponent={renderEmptyRestaurantsList}
-    />
-    <DeleteModal
-      isVisible={restaurantToBeDeleted !== null}
-      onCancel={() => setRestaurantToBeDeleted(null)}
-      onConfirm={() => removeRestaurant(restaurantToBeDeleted)}>
-        <TextRegular>The products of this restaurant will be deleted as well</TextRegular>
-        <TextRegular>If the restaurant has orders, it cannot be deleted.</TextRegular>
-    </DeleteModal>
-    </>
+      ListEmptyComponent={renderEmptySchedulesList}
+      />
+      <DeleteModal
+      isVisible={ScheduleToBeDeleted !== null}
+      onCancel={() => setScheduleToBeDeleted(null)}
+      onConfirm={() => remove(ScheduleToBeDeleted)}>
+      <TextRegular>If the product belong to some order, it cannot be deleted.</TextRegular>
+      </DeleteModal>
+      </>
+    </View>
   )
 }
 
@@ -213,5 +212,9 @@ const styles = StyleSheet.create({
   emptyList: {
     textAlign: 'center',
     padding: 50
+  },
+  productsAssociatedText: {
+    textAlign: 'right',
+    color: GlobalStyles.brandSecondary
   }
 })

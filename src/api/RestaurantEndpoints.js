@@ -1,30 +1,43 @@
-import { get, post, put, destroy, patch } from './helpers/ApiRequestsHelper'
-function getAll () {
+import { get, post, put, destroy } from './helpers/ApiRequestsHelper'
+
+const getAll = () => {
   return get('users/myrestaurants')
 }
 
-function getDetail (id) {
+const getDetail = (id) => {
   return get(`restaurants/${id}`)
 }
 
-function getRestaurantCategories () {
+const getRestaurantCategories = () => {
   return get('restaurantCategories')
 }
 
-function create (data) {
+const create = (data) => {
   return post('restaurants', data)
 }
 
-function update (id, data) {
+const update = (id, data) => {
   return put(`restaurants/${id}`, data)
 }
 
-function remove (id) {
+const remove = (id) => {
   return destroy(`restaurants/${id}`)
 }
 
-function togglePinned (id) {
-  return patch(`restaurants/${id}/togglePinned`)
+const getRestaurantSchedules = (id) => {
+  return get(`/restaurants/${id}/schedules`)
 }
 
-export { getAll, getDetail, getRestaurantCategories, create, update, remove, togglePinned }
+const createSchedule = (restaurantId, data) => {
+  return post(`/restaurants/${restaurantId}/schedules`, data)
+}
+
+const updateSchedule = (restaurantId, scheduleId, data) => {
+  return put(`/restaurants/${restaurantId}/schedules/${scheduleId}`, data)
+}
+
+const removeSchedule = (restaurantId, scheduleId) => {
+  return destroy(`/restaurants/${restaurantId}/schedules/${scheduleId}`)
+}
+
+export { getAll, getDetail, getRestaurantCategories, create, update, remove, getRestaurantSchedules, createSchedule, updateSchedule, removeSchedule }

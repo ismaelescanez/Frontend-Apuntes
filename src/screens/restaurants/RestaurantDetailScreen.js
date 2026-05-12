@@ -51,6 +51,24 @@ export default function RestaurantDetailScreen ({ navigation, route }) {
             </TextRegular>
           </View>
         </Pressable>
+        <Pressable
+          onPress={() => navigation.navigate('RestaurantSchedulesScreen', { id: restaurant.id })
+          }
+          style={({ pressed }) => [
+            {
+              backgroundColor: pressed
+                ? GlobalStyles.brandBlueTap
+                : GlobalStyles.brandBlue
+            },
+            styles.button
+          ]}>
+          <View style={[{ flex: 1, flexDirection: 'row', justifyContent: 'center' }]}>
+            <MaterialCommunityIcons name='timetable' color={'white'} size={20} />
+            <TextRegular textStyle={styles.text}>
+              Manage schedules
+            </TextRegular>
+          </View>
+        </Pressable>
       </View>
     )
   }
@@ -63,9 +81,26 @@ export default function RestaurantDetailScreen ({ navigation, route }) {
       >
         <TextRegular numberOfLines={2}>{item.description}</TextRegular>
         <TextSemiBold textStyle={styles.price}>{item.price.toFixed(2)}€</TextSemiBold>
-        {!item.availability &&
-          <TextRegular textStyle={styles.availability }>Not available</TextRegular>
-        }
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            {item.schedule
+              ? <>
+                  <MaterialCommunityIcons name="timetable" size={18} color={GlobalStyles.brandGreen} />
+                  <TextRegular textStyle={{ color: GlobalStyles.brandGreen }}>{item.schedule.startTime} - {item.schedule.endTime}</TextRegular>
+              </>
+              : <>
+                <MaterialCommunityIcons name="timetable" size={18} color={GlobalStyles.brandPrimary} />
+                <TextRegular textStyle={{ color: GlobalStyles.brandPrimary }}>Not scheduled</TextRegular>
+              </>
+            }
+          </View>
+          <View>
+            {!item.availability &&
+              <TextRegular textStyle={styles.availability}>Not available</TextRegular>
+            }
+          </View>
+        </View>
+
          <View style={styles.actionButtonsContainer}>
           <Pressable
             onPress={() => navigation.navigate('EditProductScreen', { id: item.id })

@@ -15,14 +15,15 @@ export default function InputItem (props) {
             <TextRegular>{label}</TextRegular>
           </View>
           <View style={styles.inputWrapper}>
-            <TextInput
-                {...inputProps}
-                name={name}
-                style={styles.input}
-                onChangeText={formik ? formik.handleChange(name) : undefined}
-                onBlur={formik ? formik.handleBlur(name) : undefined}
-                value={formik && formik.values[name] ? formik.values[name].toString() : undefined}
+          <TextInput
+              {...inputProps}
+              name={name}
+              style={styles.input}
+              onChangeText={formik ? formik.handleChange(name) : undefined}
+              onBlur={formik ? formik.handleBlur(name) : undefined}
+              value={formik ? (formik.values[name] ?? '').toString() : ''}
             />
+
           </View>
         </View>
         {formik && <ErrorMessage name={name} render={msg => <TextError>{msg}</TextError> }/>}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Image, Platform, Pressable, ScrollView, StyleSheet, View, Switch } from 'react-native'
+import { Image, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native'
 import * as ExpoImagePicker from 'expo-image-picker'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import * as yup from 'yup'
@@ -19,7 +19,7 @@ export default function CreateRestaurantScreen ({ navigation }) {
   const [restaurantCategories, setRestaurantCategories] = useState([])
   const [backendErrors, setBackendErrors] = useState()
 
-  const initialRestaurantValues = { name: null, description: null, address: null, postalCode: null, url: null, shippingCosts: null, email: null, phone: null, restaurantCategoryId: null, pinned: null }
+  const initialRestaurantValues = { name: null, description: null, address: null, postalCode: null, url: null, shippingCosts: null, email: null, phone: null, restaurantCategoryId: null }
   const validationSchema = yup.object().shape({
     name: yup
       .string()
@@ -53,9 +53,7 @@ export default function CreateRestaurantScreen ({ navigation }) {
       .number()
       .positive()
       .integer()
-      .required('Restaurant category is required'),
-    pinned: yup
-      .boolean()
+      .required('Restaurant category is required')
   })
 
   useEffect(() => {
@@ -179,8 +177,6 @@ export default function CreateRestaurantScreen ({ navigation }) {
                 dropDownStyle={{ backgroundColor: '#fafafa' }}
               />
               <ErrorMessage name={'restaurantCategoryId'} render={msg => <TextError>{msg}</TextError> }/>
-              </View>
-              <ErrorMessage name={'pinned'} render={msg => <TextError>{msg}</TextError> }/>
 
               <Pressable onPress={() =>
                 pickImage(
@@ -207,19 +203,6 @@ export default function CreateRestaurantScreen ({ navigation }) {
                 <TextRegular>Hero image: </TextRegular>
                 <Image style={styles.image} source={values.heroImage ? { uri: values.heroImage.assets[0].uri } : restaurantBackground} />
               </Pressable>
-
-              <View style={[{ marginTop: 20, justifyContent: 'flex-start' }]}>
-                <TextRegular>Pin restaurant?</TextRegular>
-                <Switch
-                trackColor={{ false: GlobalStyles.brandSecondary, true: GlobalStyles.brandPrimary }}
-                thumbColor={values.pinned ? GlobalStyles.brandSecondary : '#f4f3f4'}
-                // onValueChange={toggleSwitch}
-                value={values.pinned}
-                style={styles.switch}
-                onValueChange={value =>
-                  setFieldValue('pinned', value)
-                }
-              />
 
               {backendErrors &&
                 backendErrors.map((error, index) => <TextError key={index}>{error.param}-{error.msg}</TextError>)
@@ -277,8 +260,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignSelf: 'center',
     marginTop: 5
-  },
-  switch: {
-    marginTop: 10
   }
 })
