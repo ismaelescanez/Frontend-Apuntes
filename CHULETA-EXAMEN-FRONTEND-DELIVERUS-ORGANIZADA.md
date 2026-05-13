@@ -19,6 +19,9 @@ Antes de escribir codigo, decide si el examen es de:
 Si el enunciado habla de restaurantes, productos, horarios, categorias o pedidos del owner, casi siempre vas a `DeliverUS-Frontend-Owner/src/screens/` y `DeliverUS-Frontend-Owner/src/api/`.
 Si habla de direcciones, carrito o pedidos del cliente, casi siempre vas a `DeliverUS-Frontend/src/screens/` y `DeliverUS-Frontend/src/api/`.
 
+<img width="1088" height="612" alt="image" src="https://github.com/user-attachments/assets/ee84dc0c-b313-43ad-9c3d-f3c7ca962bae" />
+
+
 ---
 
 ## 1. Mapa rapido de los examenes que has visto
